@@ -1,75 +1,50 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
-require('dotenv').config();
+require("dotenv").config();
 
 const app = express();
 const port = 3000;
 
-let browser;
+app.get('/screenshot', async (req, res) => {
+  const { url, width, height } = req.query;
 
-(async () => {
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
+
   try {
-    browser = await puppeteer.launch({
+    const browser = await puppeteer.launch({
       args: [
-        '--disable-setuid-sandbox',
-        '--no-sandbox',
-        '--single-process',
-        '--no-zygote',
-        '--disable-dev-shm-usage',
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+        "--disable-dev-shm-usage",
       ],
-      executablePath:
-        process.env.NODE_ENV === 'production'
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
+      executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
     });
+    const page = await browser.newPage();
+    await page.goto(url);
 
-    app.get('/screenshot', async (req, res) => {
-      const { url, width, height } = req.query;
+    if (width && height) {
+      await page.setViewport({ width: parseInt(width), height: parseInt(height) });
+    }
 
-      if (!url) {
-        return res.status(400).json({ error: 'URL parameter is required' });
-      }
+    const screenshotOptions = {
+      fullPage: !(width && height), // Take full-page screenshot if width and height are not provided
+    };
 
-      try {
-        const page = await browser.newPage();
-        const viewportWidth = !isNaN(width) ? parseInt(width) : undefined;
-        const viewportHeight = !isNaN(height) ? parseInt(height) : undefined;
-
-        if (viewportWidth && viewportHeight) {
-          await page.setViewport({ width: viewportWidth, height: viewportHeight });
-        }
-
-        await page.goto(url, {
-          waitUntil: 'networkidle0',
-          timeout: 15000, // Increase the timeout value to 15 seconds
-        });
-
-        const screenshotOptions = {
-          fullPage: !(viewportWidth && viewportHeight),
-        };
-
-        const screenshotBuffer = await page.screenshot(screenshotOptions);
-        await page.close();
-
-        res.set('Content-Type', 'image/png');
-        res.send(screenshotBuffer);
-      } catch (error) {
-        console.error('Error capturing screenshot:', error);
-        return res.status(500).json({ error: 'Failed to capture screenshot' });
-      }
-    });
-
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  } catch (error) {
-    console.error('Error launching browser:', error);
-  }
-})();
-
-process.on('SIGINT', async () => {
-  if (browser) {
+    const screenshotBuffer = await page.screenshot(screenshotOptions);
     await browser.close();
+
+    res.set('Content-Type', 'image/png');
+    res.send(screenshotBuffer);
+  } catch (error) {
+    console.error('Error capturing screenshot:', error);
+    return res.status(500).json({ error: 'Failed to capture screenshot' });
   }
-  process.exit(0);
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
