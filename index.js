@@ -41,7 +41,7 @@ let browser;
 
         await page.goto(url, {
           waitUntil: 'networkidle0',
-          timeout: 5000,
+          timeout: 15000, // Increase the timeout value to 15 seconds
         });
 
         const screenshotOptions = {
