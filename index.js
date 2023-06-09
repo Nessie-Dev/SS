@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 app.get('/screenshot', async (req, res) => {
-  const { url } = req.query;
+  const { url, width, height } = req.query;
 
   if (!url) {
     return res.status(400).json({ error: 'URL parameter is required' });
@@ -24,7 +24,16 @@ app.get('/screenshot', async (req, res) => {
     });
     const page = await browser.newPage();
     await page.goto(url);
-    const screenshotBuffer = await page.screenshot();
+
+    if (width && height) {
+      await page.setViewport({ width: parseInt(width), height: parseInt(height) });
+    }
+
+    const screenshotOptions = {
+      fullPage: !(width && height), // Take full-page screenshot if width and height are not provided
+    };
+
+    const screenshotBuffer = await page.screenshot(screenshotOptions);
     await browser.close();
 
     res.set('Content-Type', 'image/png');
