@@ -22,7 +22,7 @@ app.get('/screenshot', async (req, res) => {
     res.send(screenshotBuffer);
   } catch (error) {
     console.error('Error capturing screenshot:', error);
-    res.status(500).json({ error: 'Failed to capture screenshot' });
+    return res.status(500).json({ error: 'Failed to capture screenshot' });
   }
 });
 
