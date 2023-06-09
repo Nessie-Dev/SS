@@ -1,5 +1,6 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
+require("dotenv").config();
 
 const app = express();
 const port = 3000;
@@ -12,7 +13,15 @@ app.get('/screenshot', async (req, res) => {
   }
 
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote"
+      ],
+      executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath();
+    });
     const page = await browser.newPage();
     await page.goto(url);
     const screenshotBuffer = await page.screenshot();
