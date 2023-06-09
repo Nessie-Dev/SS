@@ -15,7 +15,7 @@ let browser;
         '--no-sandbox',
         '--single-process',
         '--no-zygote',
-        '--disable-dev-shm-usage', // Add this flag for improved performance
+        '--disable-dev-shm-usage',
       ],
       executablePath:
         process.env.NODE_ENV === 'production'
@@ -32,15 +32,20 @@ let browser;
 
       try {
         const page = await browser.newPage();
-        await page.setViewport({ width: parseInt(width), height: parseInt(height) });
+        const viewportWidth = !isNaN(width) ? parseInt(width) : undefined;
+        const viewportHeight = !isNaN(height) ? parseInt(height) : undefined;
+
+        if (viewportWidth && viewportHeight) {
+          await page.setViewport({ width: viewportWidth, height: viewportHeight });
+        }
 
         await page.goto(url, {
           waitUntil: 'networkidle0',
-          timeout: 5000, // Adjust the timeout value as needed
+          timeout: 5000,
         });
 
         const screenshotOptions = {
-          fullPage: !(width && height), // Take full-page screenshot if width and height are not provided
+          fullPage: !(viewportWidth && viewportHeight),
         };
 
         const screenshotBuffer = await page.screenshot(screenshotOptions);
