@@ -1,5 +1,3 @@
-Sure! Here's the documentation for the API:
-
 ## Screenshot API
 
 The Screenshot API allows you to capture screenshots of web pages. It uses Puppeteer, a Node library for controlling headless Chrome or Chromium, to navigate to a URL and capture the screenshot.
