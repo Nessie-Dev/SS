@@ -54,7 +54,7 @@ app.get('/screenshot', async (req, res) => {
 
    
     const screenshotOptions = {
-      fullPage: !(width && height), /
+      fullPage: !(width && height),
       type: 'png',
     };
 
