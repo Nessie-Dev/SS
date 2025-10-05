@@ -1,6 +1,7 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
 require('dotenv').config();
+const { setTimeout } = require('timers/promises');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,7 +10,6 @@ let browser;
 
 async function getBrowser() {
   if (browser) return browser;
-  console.log('Launching new browser...');
   browser = await puppeteer.launch({
     headless: 'shell',
     args: [
@@ -40,7 +40,7 @@ app.get('/screenshot', async (req, res) => {
 
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 120000 });
 
-    if (delay) await page.waitForTimeout(parseInt(delay, 10));
+    if (delay) await setTimeout(parseInt(delay, 10));
 
     const screenshotBuffer = await page.screenshot({ fullPage: !(width && height), type: 'png' });
 
