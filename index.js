@@ -12,6 +12,7 @@ async function getBrowser() {
   if (browser) return browser;
   browser = await puppeteer.launch({
     headless: 'shell',
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome',
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
