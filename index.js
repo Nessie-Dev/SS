@@ -20,10 +20,6 @@ async function getBrowser() {
       '--no-zygote',
       '--single-process',
     ],
-    executablePath:
-      process.env.NODE_ENV === 'production'
-        ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
   });
   return browser;
 }
