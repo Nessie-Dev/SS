@@ -1,5 +1,5 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 require('dotenv').config();
 const { setTimeout } = require('timers/promises');
 
